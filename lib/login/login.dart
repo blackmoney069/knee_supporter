@@ -4,9 +4,9 @@ class loginPage extends StatelessWidget {
   const loginPage({Key? key}) : super(key: key);
 
   @override
-  void initState(){
-    super.initState()
-  }
+  // void initState(){
+  //   super.initState()
+  // }
 
   @override
   Widget build(BuildContext context) {
