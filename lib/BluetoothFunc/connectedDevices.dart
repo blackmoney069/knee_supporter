@@ -11,7 +11,6 @@ class ConnectedDevices extends StatefulWidget {
 }
 
 class _ConnectedDevicesState extends State<ConnectedDevices> {
-
   _addDeviceTolist(final BluetoothDevice device) {
     if (!widget.devicesList.contains(device)) {
       setState(() {
@@ -23,7 +22,7 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
   ListView _buildListViewOfDevices() {
     List<Padding> containers = [];
     for (BluetoothDevice device in widget.devicesList) {
-      if(device.name==""){
+      if (device.name == "") {
         continue;
       } // filtering the devices with required names only
       containers.add(
@@ -35,31 +34,68 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
               borderRadius: BorderRadius.circular(5),
             ),
             child: Padding(
-              padding: const EdgeInsets.fromLTRB(8.0,0,8.0,0),
+              padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 0),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
-                      children: <Widget>[
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Text(device.name == '' ? '(unknown device)' : device.name,style: TextStyle(fontWeight: FontWeight.bold),),
+                    children: <Widget>[
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Text(
+                          device.name == '' ? '(unknown device)' : device.name,
+                          style: TextStyle(fontWeight: FontWeight.bold),
                         ),
-                        Padding(
-                          padding: const EdgeInsets.all(2.0),
-                          child: Text(device.id.toString(),style: TextStyle(fontSize: 10),),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.all(2.0),
+                        child: Text(
+                          device.id.toString(),
+                          style: TextStyle(fontSize: 10),
                         ),
-                      ],
-                    ),
-                  FlatButton(
-                    color: Colors.green,
-                    child: Text(
-                      'Connect',
-                      style: TextStyle(color: Colors.white),
-                    ),
-                    onPressed: () {},
+                      ),
+                    ],
                   ),
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
+                        child: TextButton(
+                            child: Text(
+                              'Connect',
+                              style: TextStyle(color: Colors.white),
+                            ),
+                            style: ButtonStyle(
+                              backgroundColor: MaterialStateProperty.all(Colors.green[300]),
+                            ),
+                            onPressed: () async {
+                              widget.flutterBlue.stopScan();
+                              try {
+                                await device.connect();
+                              } catch (e) {
+                                rethrow;
+                              }
+                            }),
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
+                        child: TextButton(
+                          style: ButtonStyle(
+                            backgroundColor: MaterialStateProperty.all(Colors.green[300]),
+                          ),
+                          onPressed: () async {
+                            await device.disconnect();
+                            print("Connection ended");
+                          },
+                          child: Text(
+                            "Disconnect",
+                            style: TextStyle(color: Colors.red[400]),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
                 ],
               ),
             ),
@@ -70,17 +106,15 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
 
     return ListView(
       padding: const EdgeInsets.all(8),
-
       children: <Widget>[
         Center(
           child: Padding(
-            padding: const EdgeInsets.fromLTRB(0,0,0,10.0),
-            child: Text("Choose a Device to connect",
-            style: TextStyle(
-              fontFamily: "Silkscreen",
-              fontSize: 15,
-              color: Colors.white
-            ),),
+            padding: const EdgeInsets.fromLTRB(0, 0, 0, 10.0),
+            child: Text(
+              "Choose a Device to connect",
+              style: TextStyle(
+                  fontFamily: "Silkscreen", fontSize: 15, color: Colors.white),
+            ),
           ),
         ),
         ...containers,
