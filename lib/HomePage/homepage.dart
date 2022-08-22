@@ -1,4 +1,5 @@
 import 'package:KneeSupporter/Bluetooth/bluetoothScreen.dart';
+import 'package:KneeSupporter/BluetoothFunc/connectedDevices.dart';
 import 'package:KneeSupporter/BluetoothFunc/notEnabled.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class HomePage extends StatelessWidget {
         title: Center(child: Text("Knee Supporter App")),
         elevation: 0,
       ),
-      body: NotEnabled(),
+      body: ConnectedDevices(),
     );
   }
 }
