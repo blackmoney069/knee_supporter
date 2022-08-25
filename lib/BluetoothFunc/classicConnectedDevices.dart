@@ -1,28 +1,65 @@
+import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_blue/flutter_blue.dart';
 
-class ConnectedDevices extends StatefulWidget {
-  ConnectedDevices({Key? key}) : super(key: key);
-  final FlutterBlue flutterBlue = FlutterBlue.instance;
-  final List<BluetoothDevice> devicesList = [];
+class BluetoothFunc extends StatefulWidget {
+  const BluetoothFunc({Key? key}) : super(key: key);
 
   @override
-  State<ConnectedDevices> createState() => _ConnectedDevicesState();
+  State<BluetoothFunc> createState() => _BluetoothFuncState();
 }
 
-class _ConnectedDevicesState extends State<ConnectedDevices> {
-  _addDeviceTolist(final BluetoothDevice device) {
-    if (!widget.devicesList.contains(device)) {
-      setState(() {
-        widget.devicesList.add(device);
-      });
+class _BluetoothFuncState extends State<BluetoothFunc> {
+  BluetoothState _bluetoothState = BluetoothState.UNKNOWN;
+
+  FlutterBluetoothSerial _bluetooth = FlutterBluetoothSerial.instance;
+
+  List<BluetoothDevice> _devicesList = [];
+
+  Future<void> getPairedDevices() async {
+    List<BluetoothDevice> devices = [];
+    Stream<BluetoothDiscoveryResult> discoveryResult =
+    _bluetooth.startDiscovery();
+    await for (final value in discoveryResult) {
+      devices.add(value.device);
+      print("Device added");
     }
+
+    List<BluetoothDevice> bondedDevices = await _bluetooth.getBondedDevices();
+    devices = devices + bondedDevices;
+
+
+    // Store the [devices] list in the [_devicesList] for accessing
+    // the list outside this class
+    setState(() {
+      _devicesList = devices;
+    });
   }
+
+  @override
+  void initState() {
+    super.initState();
+
+    FlutterBluetoothSerial.instance.state.then((state) {
+      setState(() {
+        _bluetoothState = state;
+      });
+    });
+
+    _bluetooth.onStateChanged().listen((BluetoothState state) {
+      setState(() {
+        _bluetoothState = state;
+      });
+    });
+    // For retrieving the paired devices list
+    getPairedDevices();
+  }
+
+  bool isDisconnecting = false;
 
   ListView _buildListViewOfDevices() {
     List<Padding> containers = [];
-    for (BluetoothDevice device in widget.devicesList) {
-      if (device.name == "") {
+    for (BluetoothDevice device in _devicesList) {
+      if (device.name == null) {
         continue;
       } // filtering the devices with required names only
       containers.add(
@@ -44,14 +81,16 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
                       Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          device.name == '' ? '(unknown device)' : device.name,
+                          device.name == null
+                              ? '(unknown device)'
+                              : device.name as String,
                           style: TextStyle(fontWeight: FontWeight.bold),
                         ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(2.0),
                         child: Text(
-                          device.id.toString(),
+                          device.address,
                           style: TextStyle(fontSize: 10),
                         ),
                       ),
@@ -67,27 +106,26 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
                               style: TextStyle(color: Colors.white),
                             ),
                             style: ButtonStyle(
-                              backgroundColor: MaterialStateProperty.all(Colors.green[300]),
+                              backgroundColor:
+                              MaterialStateProperty.all(Colors.green[300]),
                             ),
-                            onPressed: () async {
-                              widget.flutterBlue.stopScan();
-                              try {
-                                await device.connect();
-                              } catch (e) {
-                                rethrow;
+                            onPressed: ()async{
+                              try{
+                                await BluetoothConnection.toAddress(device.address);
+                              } catch(e){
+                                print("error in connection");
                               }
-                            }),
+                            },
+                        ),
                       ),
                       Padding(
                         padding: const EdgeInsets.fromLTRB(4.0, 0, 4.0, 0),
                         child: TextButton(
                           style: ButtonStyle(
-                            backgroundColor: MaterialStateProperty.all(Colors.green[300]),
+                            backgroundColor:
+                            MaterialStateProperty.all(Colors.green[300]),
                           ),
-                          onPressed: () async {
-                            await device.disconnect();
-                            print("Connection ended");
-                          },
+                          onPressed: () {},
                           child: Text(
                             "Disconnect",
                             style: TextStyle(color: Colors.red[400]),
@@ -120,24 +158,6 @@ class _ConnectedDevicesState extends State<ConnectedDevices> {
         ...containers,
       ],
     );
-  }
-
-  @override
-  void initState() {
-    super.initState();
-    widget.flutterBlue.connectedDevices
-        .asStream()
-        .listen((List<BluetoothDevice> devices) {
-      for (BluetoothDevice device in devices) {
-        _addDeviceTolist(device);
-      }
-    });
-    widget.flutterBlue.scanResults.listen((List<ScanResult> results) {
-      for (ScanResult result in results) {
-        _addDeviceTolist(result.device);
-      }
-    });
-    widget.flutterBlue.startScan();
   }
 
   @override
