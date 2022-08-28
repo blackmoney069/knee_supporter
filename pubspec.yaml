@@ -30,6 +30,7 @@ dependencies:
   flutter:
     sdk: flutter
   splashscreen:
+  scoped_model: ^2.0.0-nullsafety.0
   flutter_bluetooth_serial: ^0.4.0
 
 

@@ -1,40 +1,15 @@
-import 'package:KneeSupporter/HomePage/homepage.dart';
+import 'package:KneeSupporter/NewUI/HomePage.dart';
 import 'package:flutter/material.dart';
-import 'login/login.dart';
 
-void main() {
-  runApp(const MyApp());
-}
+import './MainPage.dart';
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+void main() => runApp(new ExampleApplication());
 
-  // This widget is the root of your application.
+class ExampleApplication extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'Flutter Demo',
-      theme: ThemeData(
-        // This is the theme of your application.
-        //
-        // Try running your application with "flutter run". You'll see the
-        // application has a blue toolbar. Then, without quitting the app, try
-        // changing the primarySwatch below to Colors.green and then invoke
-        // "hot reload" (press "r" in the console where you ran "flutter run",
-        // or simply save your changes to "hot reload" in a Flutter IDE).
-        // Notice that the counter didn't reset back to zero; the application
-        // is not restarted.
-        primarySwatch: Colors.green,
-      ),
-      routes: {
-        "/":(context) => loginPage(),
-        '/home':(context)=>HomePage(),
-        '/user':(context)=>HomePage(),
-        '/reminders':(context)=>HomePage(),
-        '/history':(context)=>HomePage(),
-      },
-    );
+    return MaterialApp(home: HomePage(), theme: ThemeData(
+      primarySwatch: Colors.green
+    ),);
   }
 }
-
-
