@@ -8,10 +8,10 @@ import 'package:KneeSupporter/NewUI/UserPage.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bluetooth_serial/flutter_bluetooth_serial.dart';
 
-class RecieveData extends StatefulWidget {
+class RecieveData2 extends StatefulWidget {
   final BluetoothDevice server;
 
-  const RecieveData({required this.server});
+  const RecieveData2({required this.server});
 
   @override
   _ChatPage createState() => new _ChatPage();
@@ -45,7 +45,7 @@ class _Message {
   }
 }
 
-class _ChatPage extends State<RecieveData> {
+class _ChatPage extends State<RecieveData2> {
   BluetoothConnection? connection;
 
   int StepsCounter = 0;
@@ -61,11 +61,8 @@ class _ChatPage extends State<RecieveData> {
   final ScrollController listScrollController = new ScrollController();
 
   bool isConnecting = true;
-
   bool get isConnected => (connection?.isConnected ?? false);
-
   bool isDisconnecting = false;
-
   int _selectedIndex = 1;
 
   final screens = [

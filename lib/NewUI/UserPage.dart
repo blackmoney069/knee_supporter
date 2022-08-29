@@ -1,10 +1,15 @@
+import 'package:KneeSupporter/NewUI/signin.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 
 class UserPage extends StatelessWidget {
   const UserPage({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
+    final user = FirebaseAuth.instance.currentUser;
+
     return Scaffold(
       body: Container(
         color: Colors.white,
@@ -12,30 +17,31 @@ class UserPage extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.center,
           children: [
-            Container(
-              child: Padding(
-                padding: const EdgeInsets.all(8.0),
-                child: Icon(
-                  Icons.person,
-                  size: 100,
-                  color: Colors.green,
-                ),
-              ),
-              decoration: BoxDecoration(
-                  color: Colors.green[100],
-                  borderRadius: BorderRadius.circular(200)),
+            CircleAvatar(
+              radius: 60,
+              backgroundImage: NetworkImage(user!.photoURL!),
             ),
             Padding(
               padding: const EdgeInsets.all(8.0),
               child: Text(
-                "Lovish Bains",
+                user.displayName!,
                 style: TextStyle(
-                    fontSize: 30,
-                    color: Colors.green[400],
-                    fontWeight: FontWeight.w500,
-                    letterSpacing: 1.5),
+                  fontFamily: "Oswald",
+                    fontSize: 20,
+                    color: Colors.black54,
+                    fontWeight: FontWeight.w700,
+                    letterSpacing: 1.2),
               ),
             ),
+          Text(
+            user.email!,
+            style: TextStyle(
+                fontFamily: "Oswald",
+                fontSize: 10,
+                color: Colors.black54,
+                fontWeight: FontWeight.w700,
+                letterSpacing: 1.2),
+          ),
             Divider(),
             Column(children: [
               Padding(
@@ -93,6 +99,17 @@ class UserPage extends StatelessWidget {
           ],
         ),
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: (){
+          final provider = Provider.of<GoogleSignInProvider>(context, listen: false);
+          provider.googleLogut();
+        },
+        child: const Icon(Icons.logout),
+        backgroundColor: Colors.green,
+      ),
     );
   }
 }
+
+
+
